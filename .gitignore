@@ -8,6 +8,9 @@ venv/
 env/
 ENV/
 .venv
+*.egg-info/
+dist/
+build/
 
 # Environment variables
 .env
@@ -27,3 +30,13 @@ Thumbs.db
 *.log
 temporal-data/
 postgres-data/
+.worker.pid
+.flask.pid
+
+# Application logs
+worker.log
+flask.log
+
+# Python cache (all locations)
+**/__pycache__/
+**/*.pyc

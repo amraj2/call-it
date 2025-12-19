@@ -15,6 +15,16 @@ fi
 echo "✅ Temporal server is accessible"
 echo ""
 
+# Detect Python command
+if command -v python3 &> /dev/null; then
+    PYTHON_CMD="python3"
+elif command -v python &> /dev/null; then
+    PYTHON_CMD="python"
+else
+    echo "❌ Error: Python not found. Please install Python 3."
+    exit 1
+fi
+
 # Run the worker
-python temporal_worker.py
+$PYTHON_CMD temporal_worker.py
 

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temporal Test Workflow</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Temporal Test Workflow</h1>
+        <p class="subtitle">
+            Run a test workflow to verify your Temporal setup
+        </p>
+
+        <form id="workflowForm">
+            <div class="form-group">
+                <label for="name">Your Name:</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="World"
+                    placeholder="Enter your name"
+                >
+            </div>
+            <button type="submit" id="submitBtn">
+                Run Test Workflow
+            </button>
+        </form>
+
+        <div class="loading" id="loading">⏳ Running workflow...</div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

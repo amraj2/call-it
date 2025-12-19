@@ -2,7 +2,7 @@
 
 from datetime import timedelta
 from temporalio import workflow
-from temporalio.common import RetryPolicy
+from temporal.shared import get_default_retry_policy, get_default_activity_timeout
 
 
 @workflow.defn(sandboxed=False)
@@ -23,8 +23,9 @@ class TestWorkflow:
         result = await workflow.execute_activity(
             "test_activity",
             name,
-            start_to_close_timeout=timedelta(seconds=30),
-            retry_policy=RetryPolicy(maximum_attempts=3),
+            start_to_close_timeout=get_default_activity_timeout(),
+            retry_policy=get_default_retry_policy(),
         )
 
         return result
+
