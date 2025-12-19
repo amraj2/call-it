@@ -1,6 +1,7 @@
 """Flask app for running Temporal workflows."""
 
 import asyncio
+import os
 from flask import Flask, jsonify, request, render_template_string
 from flask_cors import CORS
 from temporal_client import start_test_workflow
@@ -23,7 +24,8 @@ HTML_TEMPLATE = """
             box-sizing: border-box;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             display: flex;
@@ -121,76 +123,88 @@ HTML_TEMPLATE = """
         .loading.show {
             display: block;
         }
-        .workflow-id {
-            font-size: 0.85em;
-            color: #666;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🚀 Temporal Test Workflow</h1>
-        <p class="subtitle">Run a test workflow to verify your Temporal setup</p>
-        
+        <p class="subtitle">
+            Run a test workflow to verify your Temporal setup
+        </p>
+
         <form id="workflowForm">
             <div class="form-group">
                 <label for="name">Your Name:</label>
-                <input type="text" id="name" name="name" value="World" placeholder="Enter your name">
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    value="World"
+                    placeholder="Enter your name"
+                >
             </div>
-            <button type="submit" id="submitBtn">Run Test Workflow</button>
+            <button type="submit" id="submitBtn">
+                Run Test Workflow
+            </button>
         </form>
-        
+
         <div class="loading" id="loading">⏳ Running workflow...</div>
-        
+
         <div class="result" id="result"></div>
     </div>
 
     <script>
-        document.getElementById('workflowForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('name').value;
-            const submitBtn = document.getElementById('submitBtn');
-            const loading = document.getElementById('loading');
-            const result = document.getElementById('result');
-            
-            // Reset UI
-            submitBtn.disabled = true;
-            loading.classList.add('show');
-            result.className = 'result';
-            result.style.display = 'none';
-            
-            try {
-                const response = await fetch('/api/run-test', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name: name || 'World' })
-                });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    result.className = 'result success';
-                    result.innerHTML = `
-                        <strong>✅ Success!</strong><br>
-                        ${data.result}
-                    `;
-                } else {
+        document.getElementById('workflowForm')
+            .addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const name = document.getElementById('name').value;
+                const submitBtn = document.getElementById('submitBtn');
+                const loading = document.getElementById('loading');
+                const result = document.getElementById('result');
+
+                // Reset UI
+                submitBtn.disabled = true;
+                loading.classList.add('show');
+                result.className = 'result';
+                result.style.display = 'none';
+
+                try {
+                    const response = await fetch('/api/run-test', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ name: name || 'World' })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        result.className = 'result success';
+                        result.innerHTML = `
+                            <strong>✅ Success!</strong><br>
+                            ${data.result}
+                        `;
+                    } else {
+                        result.className = 'result error';
+                        result.innerHTML = `
+                            <strong>❌ Error:</strong><br>
+                            ${data.error || 'Unknown error'}
+                        `;
+                    }
+                } catch (error) {
                     result.className = 'result error';
-                    result.innerHTML = `<strong>❌ Error:</strong><br>${data.error || 'Unknown error'}`;
+                    result.innerHTML = `
+                        <strong>❌ Error:</strong><br>
+                        ${error.message}
+                    `;
+                } finally {
+                    submitBtn.disabled = false;
+                    loading.classList.remove('show');
+                    result.style.display = 'block';
                 }
-            } catch (error) {
-                result.className = 'result error';
-                result.innerHTML = `<strong>❌ Error:</strong><br>${error.message}`;
-            } finally {
-                submitBtn.disabled = false;
-                loading.classList.remove('show');
-                result.style.display = 'block';
-            }
-        });
+            });
     </script>
 </body>
 </html>
@@ -209,10 +223,10 @@ def run_test():
     try:
         data = request.get_json() or {}
         name = data.get("name", "World")
-        
+
         # Run the async workflow
         result = asyncio.run(start_test_workflow(name))
-        
+
         return jsonify({
             "success": True,
             "result": result,
@@ -231,9 +245,8 @@ def health():
 
 
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("FLASK_PORT", 5001))
     print(f"🌐 Flask app starting on http://localhost:{port}")
-    print("📋 Make sure the Temporal worker is running: python temporal_worker.py")
+    print("📋 Make sure the Temporal worker is running:")
+    print("   python temporal_worker.py")
     app.run(host="0.0.0.0", port=port, debug=True)
-
