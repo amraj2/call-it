@@ -3,38 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Temporal Test Workflow</title>
+    <title>Temporal Workflows</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Temporal Test Workflow</h1>
+        <h1>🚀 Temporal Workflows</h1>
         <p class="subtitle">
-            Run a test workflow to verify your Temporal setup
+            Select and run a workflow from the list below
         </p>
 
-        <form id="workflowForm">
-            <div class="form-group">
-                <label for="name">Your Name:</label>
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value="World"
-                    placeholder="Enter your name"
-                >
+        {% if workflows|length == 0 %}
+        <div class="no-workflows">
+            <p>No workflows are currently available.</p>
+            <p>Add workflows to <code>temporal/workflows/</code> to see them here.</p>
+        </div>
+        {% else %}
+            {% for category, category_workflows in workflows_by_category.items() %}
+            <div class="workflow-category">
+                <h2 class="category-title">{{ category|title }}</h2>
+                <div class="workflows-grid">
+                    {% for workflow in category_workflows %}
+                    <div class="workflow-card" data-workflow-id="{{ workflow.id }}">
+                        <h3 class="workflow-name">{{ workflow.name }}</h3>
+                        <p class="workflow-description">{{ workflow.description }}</p>
+                        
+                        {% if workflow.id == 'test' %}
+                        <div class="workflow-actions">
+                            <a href="{{ url_for('main.test_workflow') }}" class="view-workflow-btn">
+                                View & Run Workflow →
+                            </a>
+                        </div>
+                        {% else %}
+                        {% if workflow.parameters|length > 0 %}
+                        <form class="workflow-form" data-workflow-id="{{ workflow.id }}">
+                            {% for param in workflow.parameters %}
+                            <div class="form-group">
+                                <label for="{{ workflow.id }}_{{ param.name }}">
+                                    {{ param.label or param.name }}:
+                                    {% if param.required %}<span class="required">*</span>{% endif %}
+                                </label>
+                                <input
+                                    type="{{ param.type }}"
+                                    id="{{ workflow.id }}_{{ param.name }}"
+                                    name="{{ param.name }}"
+                                    value="{{ param.default or '' }}"
+                                    placeholder="{{ param.description or param.name }}"
+                                    {% if param.required %}required{% endif %}
+                                >
+                                {% if param.description %}
+                                <small class="param-description">{{ param.description }}</small>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                            <button type="submit" class="run-workflow-btn">
+                                Run {{ workflow.name }}
+                            </button>
+                        </form>
+                        {% else %}
+                        <form class="workflow-form" data-workflow-id="{{ workflow.id }}">
+                            <button type="submit" class="run-workflow-btn">
+                                Run {{ workflow.name }}
+                            </button>
+                        </form>
+                        {% endif %}
+                        
+                        <div class="workflow-result" id="result-{{ workflow.id }}"></div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
             </div>
-            <button type="submit" id="submitBtn">
-                Run Test Workflow
-            </button>
-        </form>
+            {% endfor %}
+        {% endif %}
 
-        <div class="loading" id="loading">⏳ Running workflow...</div>
-
-        <div class="result" id="result"></div>
+        <div class="loading" id="loading" style="display: none;">
+            ⏳ Running workflow...
+        </div>
     </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
 </html>
-

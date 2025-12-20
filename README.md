@@ -119,7 +119,11 @@ python3 temporal_client.py
 
 ## Adding New Workflows
 
-See `temporal/README.md` for detailed instructions on adding new workflows and activities.
+See `WORKFLOW_GUIDE.md` for a complete step-by-step guide on creating new workflows, adding them to the Flask app, and creating dedicated pages.
+
+Quick reference:
+- `temporal/README.md` - Temporal structure and organization
+- `WORKFLOW_GUIDE.md` - Complete workflow creation guide
 
 ## Configuration
 
@@ -183,9 +187,22 @@ See `temporal/README.md` for detailed instructions on adding new workflows and a
 - **Temporal Activities**: Organized by domain in `temporal/activities/`
 - **Auto-discovery**: Workflows and activities are automatically registered
 
+### Creating New Workflows
+
+**📖 See `WORKFLOW_GUIDE.md` for complete step-by-step instructions.**
+
+Quick overview:
+1. Create activity in `temporal/activities/`
+2. Create workflow in `temporal/workflows/`
+3. Register both in their respective `__init__.py` files
+4. Add Flask route in `app/routes/main.py`
+5. Create HTML template in `app/templates/workflows/`
+
+**Template file:** `docs/workflow_template.py` contains copy-paste templates.
+
 ### Adding New Features
 
-1. **New Workflow**: Add to `temporal/workflows/` and register in `__init__.py`
+1. **New Workflow**: Follow `WORKFLOW_GUIDE.md` for complete instructions
 2. **New Activity**: Add to `temporal/activities/` and register in `__init__.py`
 3. **New API Endpoint**: Add route to `app/routes/api.py`
 4. **New Page**: Add route to `app/routes/main.py` and template to `app/templates/`
